@@ -1,0 +1,22 @@
+steps:
+  - name: 'node:current-alpine'
+    dir: 'frontend'
+    entrypoint: 'npm'
+    args: ['install', '--silent']
+  - name: 'node:current-alpine'
+    dir: 'frontend'
+    entrypoint: 'npm'
+    args: ['install', 'react-scripts@3.0.1', '-g', '--silent']
+  - name: 'node:current-alpine'
+    dir: 'frontend'
+    entrypoint: 'yarn'
+    args: ['build', '--production=true']
+  - name: 'bash'
+    args: ['rm', '-rf', 'backend/static']
+  - name: 'bash'
+    args: ['mv', 'frontend/build', 'backend/static']
+  - name: 'bash'
+    args: ['mv', 'appengine.yaml', 'backend/appengine.yaml']
+  - name: 'gcr.io/cloud-builders/gcloud'
+    dir: 'backend'
+    args: ['app', 'deploy', 'appengine.yaml']

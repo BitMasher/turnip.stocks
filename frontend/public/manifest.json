@@ -1,0 +1,15 @@
+{
+  "short_name": "Turnip Stock",
+  "name": "Animal Crossing Turnip Stock Market",
+  "icons": [
+    {
+      "src": "noun_Turnip_1961526_512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#00BFA5",
+  "background_color": "#F5F5F6"
+}
