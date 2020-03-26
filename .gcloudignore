@@ -1,0 +1,6 @@
+.git
+**/.gitignore
+frontend/node_modules
+frontend/build
+frontend/yarn-error.log
+frontend/.idea
