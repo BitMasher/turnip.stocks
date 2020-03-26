@@ -2,12 +2,22 @@ import React, {useEffect, useState} from 'react';
 import marketService, {IStalk} from './services/marketService';
 import {
 	Avatar,
+	Button,
 	Card,
 	CardContent,
 	CardHeader,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
 	Grid,
-	List, ListItem, ListItemAvatar,
-	ListItemText, Typography
+	List,
+	ListItem,
+	ListItemAvatar,
+	ListItemText,
+	TextField,
+	Typography
 } from "@material-ui/core";
 import {Sparklines, SparklinesLine} from "react-sparklines";
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
@@ -15,7 +25,7 @@ import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
 import useSiteContext from "./hooks/useSiteContext";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import Ifx from "./Ifx";
-import {IPosition} from "./db/TurnipRepository";
+import {db, ETurnipAction, IPosition} from "./db/TurnipRepository";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -30,6 +40,12 @@ function StockList() {
 	const siteContext = useSiteContext();
 	const [stalkList, setStalkList] = useState<IStalk[]>([]);
 	const [positions, setPositions] = useState<IPosition[]>([]);
+	const [open, setOpen] = useState(false);
+	const [ledgerQuantity, setLedgerQuantity] = useState(0);
+	const [ledgerPrice, setLedgerPrice] = useState(0);
+	const [ledgerAction, setLedgerAction] = useState(ETurnipAction.Sell);
+	const [turnipTotal, setTurnipTotal] = useState(0);
+	const [processing, setProcessing] = useState(false);
 
 	useEffect(() => {
 		marketService.getWatchedExchanges().then((exchangeList) => {
@@ -42,8 +58,25 @@ function StockList() {
 			if (pos !== undefined) {
 				setPositions(pos);
 			}
-		})
+		});
+		marketService.getTotalTurnips().then((turnips) => {
+			if (turnips !== undefined) {
+				setTurnipTotal(turnips);
+			}
+		});
 	}, [siteContext.reloadLatch]);
+
+	const handleClose = () => {
+		setOpen(false);
+	};
+
+	const handleLedgerPrompt = () => {
+		setProcessing(true);
+		db.addLedgerEntry(ledgerAction, ledgerQuantity, ledgerPrice).then(() => {
+			setOpen(false);
+			setProcessing(false);
+		});
+	};
 
 	const stalkEntries = stalkList.sort((a, b) => b.price - a.price).map(s => {
 		return (
@@ -83,20 +116,62 @@ function StockList() {
 							</Sparklines>
 						</React.Fragment>
 					}
+					onClick={() => {
+						if (s.price !== -1) {
+							setLedgerAction(s.isBuy ? ETurnipAction.Buy : ETurnipAction.Sell);
+							setLedgerPrice(s.price);
+							setOpen(true);
+						}
+					}}
 				/>
 			</ListItem>
 		)
 	});
 
 	return (
-		<Card className={classes.card_root}>
-			<CardHeader title="Stalk Market"/>
-			<CardContent>
-				<List>
-					{stalkEntries}
-				</List>
-			</CardContent>
-		</Card>
+		<div>
+			<Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+				<DialogTitle id="form-dialog-title">{ledgerAction === ETurnipAction.Buy ? "Buy" : "Sell"}</DialogTitle>
+				<DialogContent>
+					<DialogContentText>
+						How many turnips are
+						you {ledgerAction === ETurnipAction.Buy ? "buying" : "selling"} at {ledgerPrice} bells:
+					</DialogContentText>
+					<TextField
+						autoFocus
+						margin="dense"
+						id="ledgerQuantity"
+						label="How many?"
+						type="number"
+						error={ledgerAction === ETurnipAction.Sell && ledgerQuantity > turnipTotal}
+						helperText={
+							ledgerAction === ETurnipAction.Sell && ledgerQuantity > turnipTotal
+								? "You don't have that many turnips"
+								: false}
+						onChange={(e) => {
+							setLedgerQuantity(parseInt(e.target.value, 10))
+						}}
+						fullWidth
+					/>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={handleClose} color="primary" disabled={processing}>
+						Cancel
+					</Button>
+					<Button onClick={handleLedgerPrompt} color="primary" disabled={processing || ledgerQuantity <= 0 || isNaN(ledgerQuantity)}>
+						Log
+					</Button>
+				</DialogActions>
+			</Dialog>
+			<Card className={classes.card_root}>
+				<CardHeader title="Stalk Market"/>
+				<CardContent>
+					<List>
+						{stalkEntries}
+					</List>
+				</CardContent>
+			</Card>
+		</div>
 	)
 }
 

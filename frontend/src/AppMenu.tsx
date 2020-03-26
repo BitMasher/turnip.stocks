@@ -2,9 +2,18 @@ import {List, ListItem, ListItemText} from "@material-ui/core";
 import React, {useEffect, useState} from "react";
 import useSiteContext from "./hooks/useSiteContext";
 import {withRouter} from 'react-router-dom';
+import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 
+const useStyles = makeStyles((theme: Theme) =>
+	createStyles({
+		drawer: {
+			width: "200px"
+		}
+	}),
+);
 
 function AppMenu(props: any) {
+	const classes = useStyles();
 	const siteContext = useSiteContext();
 	const [menuItems, setMenuItems] = useState<{ link: string, text: string }[]>([]);
 	useEffect(() => {
@@ -53,11 +62,14 @@ function AppMenu(props: any) {
 	}, [siteContext.configured, siteContext.accountType, siteContext.reloadLatch]);
 
 	const menuClick = (link: string) => {
+		if(props.onClick) {
+			props.onClick();
+		}
 		props.history.push(link);
 	};
 
 	return (
-		<List>
+		<List className={classes.drawer}>
 			{menuItems.map((data: { link: string, text: string }) => (
 				<ListItem button key={data.text} onClick={() => menuClick(data.link)}>
 					<ListItemText primary={data.text} primaryTypographyProps={{variant: 'button'}}/>

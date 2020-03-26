@@ -8,6 +8,7 @@ import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import {withRouter} from 'react-router-dom';
+
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		card_root: {},
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
 	}),
 );
 
-function CallToAction (props: any) {
+function CallToAction(props: any) {
 	const classes = useStyles();
 
 	const handleCallToAction = () => {
@@ -26,23 +27,21 @@ function CallToAction (props: any) {
 
 	return (
 		<Card className={classes.card_root} raised={true}>
-			<CardActionArea>
-				<CardMedia
-					className={classes.card_media}
-					image={process.env.PUBLIC_URL + "/philippe-collard-B4y0dFOq510-unsplash.jpg"}
-					title="Photo by philippe collard on Unsplash"
-				/>
-				<CardContent>
-					<Typography gutterBottom variant="h5" component="h2">
-						Turnip Stocks
-					</Typography>
-					<Typography variant="body2" color="textSecondary" component="p">
-						Are you ready to become turnipcially independent?<br/>
-						Ready to play the market and take a risk?<br/>
-						Join Americas fast growing turnip economy!
-					</Typography>
-				</CardContent>
-			</CardActionArea>
+			<CardMedia
+				className={classes.card_media}
+				image={process.env.PUBLIC_URL + "/philippe-collard-B4y0dFOq510-unsplash.jpg"}
+				title="Photo by philippe collard on Unsplash"
+			/>
+			<CardContent>
+				<Typography gutterBottom variant="h5" component="h2">
+					Turnip Stocks
+				</Typography>
+				<Typography variant="body2" color="textSecondary" component="p">
+					Are you ready to become turnipcially independent?<br/>
+					Ready to play the market and take a risk?<br/>
+					Join Americas fast growing turnip economy!
+				</Typography>
+			</CardContent>
 			<CardActions>
 				<Button size="small" color="primary" onClick={handleCallToAction}>
 					Get Started Today!

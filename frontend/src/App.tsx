@@ -39,9 +39,8 @@ const useStyles = makeStyles((theme: Theme) =>
 		title: {
 			flexGrow: 1,
 		},
-
 		container: {
-			marginTop: "15px"
+			marginTop: "15px",
 		},
 	}),
 );
@@ -77,7 +76,7 @@ function App() {
 						onClose={handleDrawerClose}
 						onOpen={handleDrawerOpen}
 					>
-						<AppMenu/>
+						<AppMenu onClick={handleDrawerClose}/>
 					</SwipeableDrawer>
 					<Container className={classes.container}>
 						<Switch>
